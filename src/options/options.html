@@ -61,12 +61,12 @@
     <h2>模型通道 <span class="badge">二选一</span></h2>
     <label class="row"><span>通道</span>
       <select id="provider">
-        <option value="deepseek">DeepSeek 官方 API</option>
-        <option value="ofm">OFM 免费额度</option>
+        <option value="api">API 通道（直连服务商）</option>
+        <option value="dsh">DSH 通道（走本机中转）</option>
       </select>
     </label>
 
-    <div id="groupDeepseek">
+    <div id="groupApi">
       <label class="row"><span>BASE URL</span>
         <input type="text" id="baseUrl" placeholder="https://api.deepseek.com">
       </label>
@@ -74,21 +74,22 @@
         <input type="password" id="apiKey" placeholder="sk-...">
       </label>
       <div class="hint">
-        Key 只保存在本机。前往
-        <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a> 获取。
+        填任意 OpenAI 兼容服务商的地址与 Key。默认是 DeepSeek 官方，也可填通义、火山方舟等。Key 只保存在本机。
       </div>
     </div>
 
-    <div id="groupOfm" style="display:none">
-      <label class="row"><span>反代地址</span>
-        <input type="text" id="ofmUrl" placeholder="http://127.0.0.1:18902/v1">
+    <div id="groupDsh" style="display:none">
+      <label class="row"><span>中转地址</span>
+        <input type="text" id="dshUrl" placeholder="http://127.0.0.1:18902/v1">
       </label>
-      <label class="row"><span>访问密钥</span>
-        <input type="password" id="ofmKey" placeholder="OFM 的 forwardKey">
+      <label class="row"><span>密钥</span>
+        <input type="password" id="dshKey" placeholder="插件给的 key，没有可留空">
       </label>
       <div class="hint">
-        借用 OFM 插件反代的免费额度，不消耗你自己的余额。<br>
-        实测可用：<code>openrouter/free</code>、<code>nvidia/nemotron-3.5-super-vl:free</code>、<code>kilo-auto/free</code>
+        走本机 DSH 中转，复用你已授权客户端的额度。<br>
+        任意提供 OpenAI 兼容接口的反代插件都可以，例如
+        <code>dsh-connect-workbuddy</code>、<code>dsh-connect-trae</code>、<code>dsh-connect-ofm</code>。<br>
+        填它的 <code>base_url</code>（一般以 <code>/v1</code> 结尾），然后点下方「拉取可用模型」。
       </div>
     </div>
 
