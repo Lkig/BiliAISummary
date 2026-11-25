@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Bili AI 总结",
-  "version": "2.1.1",
-  "description": "B 站视频 AI 总结（DeepSeek 驱动）",
+  "version": "2.2.0",
+  "description": "B 站视频 AI 总结：支持直连 API 或经 DSH 中转（dsh-connect-* 插件）调用模型",
   "permissions": [
     "storage",
     "unlimitedStorage",
