@@ -1,12 +1,13 @@
 // 设置与缓存
 const DEFAULTS = {
-  provider: 'deepseek',          // deepseek | ofm
+  provider: 'api',               // api | dsh
   baseUrl: 'https://api.deepseek.com',
   apiKey: '',
-  ofmUrl: 'http://127.0.0.1:18902/v1',
-  ofmKey: '',
-  summarizerModel: 'deepseek-flash',
-  visionModel: 'deepseek-flash',
+  // DSH 通道：任何 dsh-connect-* 反代插件都可以，填它的 base url
+  dshUrl: 'http://127.0.0.1:18902/v1',
+  dshKey: '',
+  summarizerModel: '',
+  visionModel: '',
   depth: 'standard',             // quick | standard | deep
   autoSummarize: false,
   asrEnabled: true,
