@@ -4,15 +4,15 @@ import { getAllPrompts, setPrompt, resetPrompt } from '../lib/promptStore.js';
 import { DEFAULTS } from '../lib/promptDefaults.js';
 
 const FIELDS = [
-  'provider', 'baseUrl', 'apiKey', 'ofmUrl', 'ofmKey',
+  'provider', 'baseUrl', 'apiKey', 'dshUrl', 'dshKey',
   'summarizerModel', 'visionModel', 'depth', 'cacheDays', 'autoSummarize'
 ];
 const $ = (id) => document.getElementById(id);
 
 function syncChannelVisibility() {
   const p = $('provider').value;
-  $('groupDeepseek').style.display = p === 'deepseek' ? '' : 'none';
-  $('groupOfm').style.display = p === 'ofm' ? '' : 'none';
+  $('groupApi').style.display = p === 'api' ? '' : 'none';
+  $('groupDsh').style.display = p === 'dsh' ? '' : 'none';
 }
 
 function fill(s) {
@@ -55,7 +55,8 @@ function fillModelSelect(ids, cur) {
   }
 }
 
-const OFM_FALLBACK = ['openrouter/free', 'nvidia/nemotron-3.5-super-vl:free', 'kilo-auto/free'];
+// DSH 中转若不实现 /models，给一份常见候选，用户也可手填
+const DSH_FALLBACK = ['openrouter/free', 'deepseek-flash', 'kilo-auto/free'];
 
 (async function init() {
   const s = await getSettings();
@@ -81,12 +82,12 @@ const OFM_FALLBACK = ['openrouter/free', 'nvidia/nemotron-3.5-super-vl:free', 'k
       const models = await listModels({
         provider: c.provider,
         baseUrl: c.baseUrl, apiKey: c.apiKey,
-        ofmUrl: c.ofmUrl, ofmKey: c.ofmKey
+        dshUrl: c.dshUrl, dshKey: c.dshKey
       });
 
       if (!models.length) {
-        if (c.provider === 'ofm') {
-          fillModelSelect(OFM_FALLBACK, c);
+        if (c.provider === 'dsh') {
+          fillModelSelect(DSH_FALLBACK, c);
           st.textContent = '该通道不返回列表，已填入内置候选';
           st.className = 'ok';
           return;
@@ -110,8 +111,8 @@ const OFM_FALLBACK = ['openrouter/free', 'nvidia/nemotron-3.5-super-vl:free', 'k
     btn.disabled = true; st.textContent = '测试中…'; st.className = '';
     try {
       const c = collect();
-      const base = c.provider === 'ofm' ? c.ofmUrl : c.baseUrl;
-      const key = c.provider === 'ofm' ? c.ofmKey : c.apiKey;
+      const base = c.provider === 'dsh' ? c.dshUrl : c.baseUrl;
+      const key = c.provider === 'dsh' ? c.dshKey : c.apiKey;
       const res = await fetch(base.replace(/\/+$/, '') + '/chat/completions', {
         method: 'POST',
         headers: {
