@@ -2,7 +2,7 @@
 
 Edge / Chrome 扩展：给 B 站视频加 **AI 内容总结**。
 
-支持 DeepSeek 官方 API 与 OFM 免费额度两种通道。
+支持两条模型通道：**API 直连**，或**经本机 DSH 中转**（复用已授权客户端的额度）。
 
 ---
 
@@ -30,25 +30,35 @@ Edge / Chrome 扩展：给 B 站视频加 **AI 内容总结**。
 
 ## 三、配置
 
-### 3.0 两种通道，先选一个
+### 3.0 两条通道
 
-| 通道 | 花钱吗 | 说明 |
+| 通道 | 说明 | 适用 |
 |---|---|---|
-| **OFM 免费额度**（推荐先试） | **免费** | 借用 OFM 插件反代的 Trae / Qoder 等客户端额度 |
-| DeepSeek 官方 API | 约 0.018 元/视频 | 最稳，按量付费 |
+| **API 通道** | 直连任意 OpenAI 兼容服务商 | DeepSeek、通义、火山方舟等有 Key 的场景 |
+| **DSH 通道** | 走本机 DSH 中转 | 复用已授权客户端的额度，不额外花钱 |
 
-**OFM 通道怎么配**：确保本机 OFM（our-free-model）插件在运行，设置页选「OFM 免费额度」，
-反代地址填 `http://127.0.0.1:18902/v1`，密钥填 OFM 设置里的 `forwardKey`（形如 `ofm-...`）。
+两条通道都按 OpenAI 协议调用 `/chat/completions`，切换只改一个下拉框。
 
-实测可直接调用（不消耗你自己的余额）：
+#### DSH 通道（本插件的特点）
 
-- `openrouter/free` ✓
-- `nvidia/nemotron-3.5-super-vl:free` ✓
-- `kilo-auto/free` ✓
+插件不绑定任何特定的反代工具，只要对方提供 OpenAI 兼容接口即可。
+常见的有 [`dsh-connect-workbuddy`](https://github.com/Lkig)、`dsh-connect-trae`、`dsh-connect-ofm` 等。
 
-> OFM 的 `/models` 返回空列表（模型由后端动态决定），设置页会自动填入上述候选。
-> 名字带 `-free` 后缀的「OpenCode 免费车道」需要本机装 Bun，否则报 502。
+配置步骤：
 
+1. 在本机启动提供反代的 DSH 插件，记下它的地址（一般形如 `http://127.0.0.1:<port>/v1`）
+2. 设置页选「DSH 通道」，填入中转地址与密钥（没有密钥可留空）
+3. 点「拉取可用模型」选模型；若该插件不实现 `/models`，会填入内置候选，也可手动输入模型名
+4. 点「测试连通性」确认
+
+实测（以 ofm 作为 DSH 中转的一种实现）：
+
+```
+DSH 通道 => DSH 中转 | base: http://127.0.0.1:18902/v1 | model: openrouter/free
+  DSH 调用: "dsh-ok"
+```
+
+> 不同反代插件暴露的模型名不同，以「拉取可用模型」的结果为准。
 ### 3.1 DeepSeek 官方 API Key
 
 1. 去 <https://platform.deepseek.com/api_keys> 创建 Key
@@ -96,7 +106,7 @@ BiliAISummary/
 │   │   ├── asr.js             # 无字幕时的语音识别兜底
 │   │   ├── summarizer.js      # 分段 map-reduce 总结
 │   │   ├── prompts.js         # 提示词模板
-│   │   ├── llm.js             # 模型客户端（DeepSeek / OFM）
+│   │   ├── llm.js             # 模型客户端（API / DSH 双通道）
 │   │   └── store.js           # 设置与缓存
 │   ├── content/               # 视频页面板
 │   ├── offscreen/             # 音频解码（16k 单声道 WAV 切片）
