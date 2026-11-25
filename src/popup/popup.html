@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<style>
+  body { width: 260px; margin: 0; padding: 16px; font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; font-size: 13px; }
+  h3 { font-size: 14px; margin: 0 0 10px; }
+  button { width: 100%; padding: 8px; margin-bottom: 8px; border: none; border-radius: 8px;
+    background: #00aeec; color: #fff; font-size: 13px; cursor: pointer; font-family: inherit; }
+  button.ghost { background: #eef4f6; color: #00aeec; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .tip { color: #9499a0; font-size: 12px; line-height: 1.5; }
+  .state { margin: 8px 0 12px; padding: 6px 10px; border-radius: 8px; background: #f2f4f6; font-size: 12px; }
+</style></head>
+<body>
+  <h3>Bili AI 总结</h3>
+  <div class="state" id="state">检测中…</div>
+  <button id="run">总结当前视频</button>
+  <button id="opts" class="ghost">打开设置</button>
+  <div class="tip" id="tip"></div>
+  <script src="popup.js"></script>
+</body></html>

@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Bili AI 总结",
+  "version": "2.1.1",
+  "description": "B 站视频 AI 总结（DeepSeek 驱动）",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://api.bilibili.com/*",
+    "https://*.bilibili.com/*",
+    "https://aisubtitle.hdslb.com/*",
+    "https://i0.hdslb.com/*",
+    "https://api.deepseek.com/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://*.bilivideo.com/*",
+    "https://*.szbdyd.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.bilibili.com/video/*",
+        "https://www.bilibili.com/list/*"
+      ],
+      "js": [
+        "src/content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "src/options/options.html",
+  "action": {
+    "default_title": "Bili AI 总结",
+    "default_popup": "src/popup/popup.html"
+  }
+}

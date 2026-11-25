@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Bili AI 总结 · 设置</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    max-width: 760px; margin: 0 auto; padding: 32px 24px 80px;
+    background: #f7f8fa; color: #18191c; line-height: 1.6;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #131417; color: #e3e5e7; }
+    .card { background: #1c1d21; border-color: #2c2e33; }
+    input, select, textarea { background: #23252a; color: #e3e5e7; border-color: #33363c; }
+    .hint, .desc { color: #8b9098; }
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #9499a0; font-size: 13px; margin-bottom: 24px; }
+  .card { background: #fff; border: 1px solid #e3e5e7; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+  .card h2 { font-size: 14px; margin: 0 0 14px; }
+  .badge { font-size: 11px; background: #00aeec1a; color: #00aeec; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+  label.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+  label.row > span:first-child { flex: 0 0 130px; font-size: 13px; }
+  input[type="text"], input[type="password"], select {
+    flex: 1; padding: 7px 10px; border: 1px solid #d5d7db; border-radius: 8px;
+    font-size: 13px; font-family: inherit; outline: none;
+  }
+  input:focus, select:focus { border-color: #00aeec; }
+  .hint { font-size: 12px; color: #9499a0; margin: -4px 0 12px; }
+  .hint a { color: #00aeec; }
+  button {
+    background: #00aeec; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  button.ghost { background: transparent; color: #00aeec; border: 1px solid #00aeec40; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .foot { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+  #status { font-size: 12.5px; }
+  .ok { color: #2ba471; } .err { color: #f85a54; }
+  .switch { position: relative; width: 40px; height: 22px; flex: 0 0 auto; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #ccd0d6; border-radius: 22px; transition: .2s; cursor: pointer; }
+  .slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 2px; top: 2px; background: #fff; border-radius: 50%; transition: .2s; }
+  .switch input:checked + .slider { background: #00aeec; }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+  textarea {
+    width: 100%; height: 260px; font-family: ui-monospace, Consolas, monospace;
+    font-size: 12.5px; line-height: 1.6; padding: 10px; border: 1px solid #d5d7db;
+    border-radius: 8px; resize: vertical;
+  }
+</style>
+</head>
+<body>
+  <h1>Bili AI 总结</h1>
+  <div class="sub">B 站视频内容总结，由 DeepSeek 驱动</div>
+
+  <div class="card">
+    <h2>模型通道 <span class="badge">二选一</span></h2>
+    <label class="row"><span>通道</span>
+      <select id="provider">
+        <option value="deepseek">DeepSeek 官方 API</option>
+        <option value="ofm">OFM 免费额度</option>
+      </select>
+    </label>
+
+    <div id="groupDeepseek">
+      <label class="row"><span>BASE URL</span>
+        <input type="text" id="baseUrl" placeholder="https://api.deepseek.com">
+      </label>
+      <label class="row"><span>API Key</span>
+        <input type="password" id="apiKey" placeholder="sk-...">
+      </label>
+      <div class="hint">
+        Key 只保存在本机。前往
+        <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a> 获取。
+      </div>
+    </div>
+
+    <div id="groupOfm" style="display:none">
+      <label class="row"><span>反代地址</span>
+        <input type="text" id="ofmUrl" placeholder="http://127.0.0.1:18902/v1">
+      </label>
+      <label class="row"><span>访问密钥</span>
+        <input type="password" id="ofmKey" placeholder="OFM 的 forwardKey">
+      </label>
+      <div class="hint">
+        借用 OFM 插件反代的免费额度，不消耗你自己的余额。<br>
+        实测可用：<code>openrouter/free</code>、<code>nvidia/nemotron-3.5-super-vl:free</code>、<code>kilo-auto/free</code>
+      </div>
+    </div>
+
+    <div class="foot" style="margin:6px 0 14px">
+      <button id="fetchModels" class="ghost">拉取可用模型</button>
+      <span id="fetchStatus"></span>
+    </div>
+
+    <label class="row"><span>总结模型</span>
+      <select id="summarizerModel"></select>
+    </label>
+    <label class="row"><span>视觉模型</span>
+      <select id="visionModel"></select>
+    </label>
+    <div class="hint">点「拉取可用模型」后从下拉框选择，不用手打。视觉模型需支持图像理解。</div>
+
+    <div class="foot">
+      <button id="testLlm">测试连通性</button>
+      <span id="testLlmStatus"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>总结偏好</h2>
+    <label class="row"><span>默认深度</span>
+      <select id="depth">
+        <option value="quick">快速（省 token）</option>
+        <option value="standard">标准</option>
+        <option value="deep">深度</option>
+      </select>
+    </label>
+    <label class="row"><span>进入视频自动总结</span>
+      <span class="switch"><input type="checkbox" id="autoSummarize"><span class="slider"></span></span>
+    </label>
+    <label class="row"><span>缓存天数</span>
+      <input type="text" id="cacheDays" placeholder="14" style="flex:0 0 80px">
+    </label>
+    <div class="foot">
+      <button id="clearCache" class="ghost">清空总结缓存</button>
+      <span id="cacheStatus"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>提示词编辑 <span class="badge">三档独立</span></h2>
+    <div class="hint">可查看与修改三档深度的提示词。改动只影响最终汇总那一步。</div>
+    <label class="row"><span>选择深度</span>
+      <select id="promptDepth">
+        <option value="quick">快速</option>
+        <option value="standard">标准</option>
+        <option value="deep">深度</option>
+      </select>
+    </label>
+    <textarea id="promptText" spellcheck="false"></textarea>
+    <div class="foot" style="margin-top:10px">
+      <button id="savePrompt">保存此档</button>
+      <button id="resetPrompt" class="ghost">恢复默认</button>
+      <span id="promptStatus"></span>
+    </div>
+  </div>
+
+  <div class="foot">
+    <button id="save">保存设置</button>
+    <span id="saveStatus" class="ok"></span>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>
